@@ -1,0 +1,32 @@
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "4001:4001"
+    environment:
+      - BASE_URL=https://textbookexchange-api.com:8080
+
+  listing-service:
+    build: ./listing-service
+    ports:
+      - "4002:4002"
+    environment:
+      - BASE_URL=https://textbookexchange-api.com:8080
+
+  messaging-service:
+    build: ./messaging-service
+    ports:
+      - "4003:4003"
+    environment:
+      - BASE_URL=https://textbookexchange-api.com:8080
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "4000:4000"
+    depends_on:
+      - user-service
+      - listing-service
+      - messaging-service
+    environment:
+      - NODE_ENV=development
