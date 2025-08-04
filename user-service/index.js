@@ -5,12 +5,10 @@
  * profile management, and serves as the primary User entity for federation.
  * Other services can extend and reference the User type defined here.
  */
-
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
 const { buildSubgraphSchema } = require('@apollo/subgraph');
 const gql = require('graphql-tag');
-const fetch = require('node-fetch');
 
 /** Base URL for the backend API service */
 const BASE_URL = process.env.BASE_URL;

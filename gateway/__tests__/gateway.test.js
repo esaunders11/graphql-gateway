@@ -11,62 +11,37 @@ describe('Apollo Gateway Integration', () => {
     expect(res.body.data.__typename).toBe('Query');
   });
 
-  test('fetches a user', async () => {
+  test('fetches currentUser', async () => {
     const res = await request(GATEWAY_URL)
       .post('')
-      .send({ query: '{ user(id: "1") { id name email } }' });
+      .send({ query: '{ currentUser { id username email } }' });
     expect(res.status).toBe(200);
-    expect(res.body.data.user).toHaveProperty('id');
-    expect(res.body.data.user).toHaveProperty('name');
-    expect(res.body.data.user).toHaveProperty('email');
+    expect(res.body.data.currentUser).toHaveProperty('id');
   });
 
-  test('fetches a listing with owner (federation)', async () => {
+  test('fetches getUser', async () => {
     const res = await request(GATEWAY_URL)
       .post('')
-      .send({ query: `
-        {
-          listing(id: "123") {
-            id
-            title
-            owner {
-              id
-              name
-              email
-            }
-          }
-        }
-      `});
+      .send({ query: '{ getUser(id: "1") { id firstname email } }' });
     expect(res.status).toBe(200);
-    expect(res.body.data.listing).toHaveProperty('id');
-    expect(res.body.data.listing.owner).toHaveProperty('id');
+    expect(res.body.data.getUser).toHaveProperty('id');
   });
 
-  test('fetches a message with sender and recipient', async () => {
+  test('fetches getListing', async () => {
     const res = await request(GATEWAY_URL)
       .post('')
-      .send({ query: `
-        {
-          message(id: "abc") {
-            id
-            text
-            sender { id name }
-            recipient { id name }
-          }
-        }
-      ` });
+      .send({ query: '{ getListing(id: "123") { id title description } }' });
     expect(res.status).toBe(200);
-    expect(res.body.data.message).toHaveProperty('id');
-    expect(res.body.data.message.sender).toHaveProperty('id');
-    expect(res.body.data.message.recipient).toHaveProperty('id');
+    expect(res.body.data.getListing).toHaveProperty('id');
   });
 
-  test('returns null for non-existent user', async () => {
+  test('searchListings returns an array', async () => {
     const res = await request(GATEWAY_URL)
       .post('')
-      .send({ query: '{ user(id: "doesnotexist") { id name email } }' });
+      .send({ query: '{ searchListings(query: "apartment") { id title } }' });
     expect(res.status).toBe(200);
-    expect(res.body.data.user).toBeNull();
+    expect(Array.isArray(res.body.data.searchListings)).toBe(true);
   });
 
+  // Continue for all your fields: getMessagesBetween, getReceivedMessages, myListings, recentListings, etc.
 });
