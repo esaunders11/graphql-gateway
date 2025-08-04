@@ -13,6 +13,8 @@ const gql = require('graphql-tag');
 /** Base URL for the backend API service */
 const BASE_URL = process.env.BASE_URL;
 
+console.log(`User service using backend API at ${BASE_URL}`);
+
 /**
  * GraphQL type definitions for the User subgraph
  * 
@@ -25,7 +27,6 @@ const typeDefs = gql`
     id: ID!
     username: String!
     email: String!
-    role: String!
     firstName: String
     lastName: String
     verified: Boolean
@@ -53,10 +54,24 @@ const resolvers = {
      * @returns {Promise<Object|null>} User object or null if not found
      */
     getUser: async (_, { id }) => {
+    try {
       const res = await fetch(`${BASE_URL}/api/users/${id}`);
-      if (!res.ok) return null;
-      return res.json();
-    },
+      if (!res.ok) {
+        console.error("Bad HTTP status:", res.status);
+        return null;
+      }
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse JSON:", text);
+        throw e;
+      }
+    } catch (err) {
+      console.error("Fetch or parse error:", err);
+      throw err;
+    }
+  },
     /**
      * Fetch the currently authenticated user
      * @param {Object} _ - Parent object (unused)
@@ -68,7 +83,9 @@ const resolvers = {
      */
     currentUser: async (_, __, { user, headers }) => {
       const res = await fetch(`${BASE_URL}/api/auth/user`, {
-        headers: { 'Authorization': headers.authorization }
+        headers: { 'Authorization': headers.authorization,
+                   'Content-Type': 'application/json'
+         }
       });
       if (!res.ok) return null;
       return res.json();
