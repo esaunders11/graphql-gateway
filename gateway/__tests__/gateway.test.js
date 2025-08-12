@@ -43,5 +43,4 @@ describe('Apollo Gateway Integration', () => {
     expect(Array.isArray(res.body.data.searchListings)).toBe(true);
   });
 
-  // Continue for all your fields: getMessagesBetween, getReceivedMessages, myListings, recentListings, etc.
 });
